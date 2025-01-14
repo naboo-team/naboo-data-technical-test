@@ -121,4 +121,7 @@ Testez votre système avec plusieurs exemples de briefs textuels. Vérifiez que 
 4.	Optionnel : Si vous avez utilisé des API externes pour obtenir des données supplémentaires, indiquez comment configurer l’accès à ces API.
 
 ## Rappel
-Lors du debrief de ce test technique, nous aurons une posture de client à qui vous devrez "vendre" votre solution.
+Lors du débrief de ce test technique, nous aurons une posture de client à qui vous devrez "vendre" votre solution. 
+
+## Important
+Ce test est volontairement particulièrement long. L'idée est de voir votre capacité à prioriser la solution la plus optimale pour répondre à un besoin.
