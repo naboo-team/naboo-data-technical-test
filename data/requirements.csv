@@ -1,0 +1,3 @@
+requirement_name,requirement_textual_name,type,operation,priority
+city,city,str,==,0
+capacity,participants number,int,>=,1

@@ -1,127 +1,49 @@
-# Test Technique : Système de Recommandation de Lieux et Activités
+# Speech to company event recommendation solution
 
-## Contexte
+## Description
+The objective of this project is to provide an interface outputting a set of relevant venue/activity results when typing a description of the desired service.
 
-Vous devez créer un système capable de recommander des lieux et des activités à partir d'un brief textuel fourni. Les bribes de texte peuvent contenir des informations sur la localisation, le type d'activité, et d'autres contraintes comme le nombre de personnes ou les préférences spécifiques.
+## Table of Contents
+- [Philosophy](#Philosophy)
+- [Data Processing](#Dataprocessing)
+- [Brief to text](#brieftotext)
+- [Recommendation](#recommendation)
+- [Respository](#Respository)
 
-### Objectifs
+## Philosophy
+The main phylosphy of the project is to try and approach the problem with a very standardized way. In the end the clients input is considered to be a set of requirements. This is ment to fasten any itterations on the service and also it prevents the code's complexity to increase with those itteration. For instance looking at a "number of participant" is no different than having a "budget", those are both numerical criterion.
+For time constraint reasons, the project is not dealing with more complexe cases but the reasoning could be the same even for more textual criterion where the only difference would be that they would require a bit more data preparation to extract details from an activity description.
 
-1. **Extraire les informations clés du brief textuel :**
-   - Localisation (ville, pays).
-   - Type d'activité (par exemple, restaurant, musée, randonnée, etc.).
-   - Autres contraintes (ambiance, taille du groupe, etc.).
+## Data Processing
+The data procesing is quite limited for now. The only criterion considered are related to the desired city and to the number of participant. There were no null values regarding the capacity of venues. For consistency the cities were put to lower string. Some cities were not mentionned for some venues but dealing with those cases would have required some extra data preparation that was not affordable when working on the project and would have potentially been useless as those venues might not even be relevant in the first place.
 
-2. **Recommander des lieux et des activités pertinents en fonction de ces informations :**
-   - Utiliser les jeux de données fournis pour rechercher des lieux, prestataires de services et prestations qui correspondent aux critères extraits du brief.
+Functions:
 
----
+load_data
 
-## Structure des Données
+clean_data
 
-Les données fournies sont réparties en plusieurs fichiers CSV. Ces fichiers représentent différents aspects du système : les prestataires de services, les lieux, les activités et les briefs textuels. Ils seront utilisés pour construire le système de recommandation.
+## Brief to text
+I did not benefit from a paid subscription to any LLM API so my first criterion was to find a free solution. I tried out the free version of the Hugging face API which was overwelmed with request most of the time which was not convenient when working with a time constraint. I ended up using a local solution with the transformers library which worked just fine for this exercice.
 
-### `briefs.csv`
-Contient les briefs textuels fournis par les utilisateurs. Ces briefs servent de point de départ pour générer des recommandations.
-- `id` : identifiant unique du lieu
-- `budget` : Budget associé au brief (donne parfois une indication lorsque non spécifié dans le brief)
-- `brief` :  Texte brut du brief contenant la demande de l’utilisateur.
+Functions:
 
+## Recommendation
+This project would be a very first mvp of the recommendation system. The idea is to approach the recommendation as a business rule system. You have requirements that are not negociatable and some that are but can be used as a way to order your recommendations by order of relevancy. In the end the clients input can be deaggregated in to a set of requirements. Then its just a matter of having this kind of requirement implemented. Its the objective of the requirements.csv file. You can specify which requirement value you want to extract from the speech of the user, which dimension it represents in your data base, how to compare the two and what level of importance this requirement should have for the recommendation system. 
+This first iteration is more of an architectural approach and is not yet dealing with a huge amount of requirements. I avoided starting off with complexe alrogirthms right away as I don't have enough business context to know if those algorithm are relevants to begin with. Also starting with a standardized approach will ease the implementation of potential algorithm as they might as well just be treated as a "requirement" and be part of the already existing recommendation system. Currently the repo doesn't provid a monitoring system for the performance of a given requirement rule. This should be the most important next step as having a good way of monitoring the performance would allow to prioritise the most important requirements to implement as well as fixing the current ones. 
 
-### `service_providers.csv`
-Contient des informations sur les prestataires de services (entreprises ou individus) proposant des activités, des services de restauration, ou autres prestations.
+To monitor the system we could think of several KPI:
+- proportion of clients request receiving an answer
+- by labelling the results (either manually or by asking the client) we could keep track of the system's precision
 
--`id` : Identifiant unique du prestataire de services.
--`title` : Nom du prestataire.
--`description` : Description du prestataire et des services proposés.
--`latitude` : Latitude de la localisation principale du prestataire.
--`longitude` : Longitude de la localisation principale du prestataire.
--`city` : Ville où se trouve le prestataire.
--`region` : Région où se trouve le prestataire.
--`postal_code` : Code postal du prestataire.
--`department` : Département où se situe le prestataire.
--`country` : Pays du prestataire.
--`category` : Catégorie du prestataire (ex. “restaurant”, “activité”).
--`max_distance_in_meters` : Distance maximale dans laquelle le prestataire opère, en mètres.
+As we devided the system into a set of criterion we might also follow each of them individually to spot potential weaknesses. In addition we could have some criterion working in a dry run state and utilising those performance dashboards to asses there relevancy before putting them in production.
+- proportion of clients request triggering the criterion
+- proportion of laballed results aligned with the criterion's label
+- redundancy of the criterion compared to the overall system (mostly usefull for the dry run state)
 
+Functions:
 
-### `services_activities.csv`
-Contient les détails des services ou activités spécifiques proposés par les prestataires.
-
-- `service_id` : Identifiant unique du service ou de l’activité.
-- `service_provider_id` : Identifiant du prestataire proposant ce service (référencé dans service_providers.csv).
-- `venue_id` : Identifiant du lieu associé à ce service (référencé dans venues.csv). Peut être vide si non lié.
-- `service_category` : Catégorie du service (ex. “activité”, “restauration”).
-- `type` : Type spécifique du service (ex. “randonnée”, “dîner gastronomique”).
-- `title` : Titre ou nom du service.
-- `description` : Description détaillée du service.
+## Testing the code
+To run the code you can start the streamlit app and type queries within the prompt.
 
 
-### `venues.csv`
-Contient des informations sur les lieux (ex. hébergements, espaces de travail, sites touristiques). Ces lieux peuvent être associés à des services spécifiques ou recommandés en tant que tels.
-
-- `id` : Identifiant unique du lieu.
-- `title` : Nom ou titre du lieu.
-- `introduction` : Brève introduction ou présentation du lieu.
-- `access` : Informations sur l’accessibilité du lieu (ex. transport en commun, parking).
-- `food` : Détails sur les options de restauration disponibles au lieu.
-- `activities` : Activités proposées directement au lieu.
-- `latitude` : Latitude de l’emplacement du lieu.
-- `longitude` : Longitude de l’emplacement du lieu.
-- `city` : Ville où se situe le lieu.
-- `region` : Région où se situe le lieu.
-- `postal_code` : Code postal du lieu.
-- `department` : Département où se situe le lieu.
-- `country` : Pays où se situe le lieu.
-- `ambiance` : Ambiance générale du lieu (ex. "campagne", “montagne”).
-- `capacity` : Capacité maximale d’accueil du lieu (en personnes).
-- `number_of_bedrooms` : Nombre de chambres disponibles au lieu.
-- `number_of_bathrooms` : Nombre de salles de bain disponibles au lieu.
-- `number_of_beds` : Nombre de lits disponibles au lieu.
-- `number_of_workspaces` : Nombre d’espaces de travail disponibles au lieu.
-- `house_type` : Type de logement ou de lieu (ex. "hotel", “lieu de séminaire”, "lieu en gestion libre").
-
-
----
-
-## Instructions
-
-### 1. Traitement du Brief Textuel
-
-Vous devrez créer un script pour extraire les informations essentielles d’un brief textuel. Ce processus inclura des tâches de traitement du langage naturel (NLP), telles que l’extraction de :
-- Localisation
-- Type d’activité
-- Autres contraintes (ambiance, taille du groupe, etc.)
-
-### 2. Système de Recommandation
-
-En utilisant les données des fichiers CSV, vous devez concevoir un système qui associe les informations extraites du brief avec les lieux et activités les plus pertinents. Pour cela :
-- Méthode recommandée : Une approche de filtrage basée sur les règles, ou un modèle de recommandation plus avancé (par exemple, KNN, apprentissage supervisé si vous avez une étiquette pour la pertinence).
-
-Le système doit produire un classement des recommandations les plus pertinentes.
-
-### 3. Structure du Code
-- data_processing.py : Ce fichier doit contenir le code pour prétraiter et analyser les données (en particulier les fichiers CSV).
-- recommendation_system.py : Ce fichier doit implémenter la logique du système de recommandation (par exemple, filtres, pondération des critères, etc.).
-- main.py : Ce fichier sera le point d’entrée, où l’utilisateur fournit un brief textuel et où les recommandations sont calculées. Il centralise les étapes clés de votre système.
-
-### 4. Tests et Validation
-
-Testez votre système avec plusieurs exemples de briefs textuels. Vérifiez que le système renvoie des recommandations pertinentes et expliquez les choix du modèle.
-- test.ipynb : Ce fichier peut contenir une analyse plus quantitative de votre système de recommandations.
-- demo_streamlit.py : Ce fichier est une app Streamlit qui peut servir de démonstrateur de votre système de recommandations.
-
----
-
-
-
-## Livrables
-1. Le code source structuré et bien documenté.
-2.	Un fichier README complet avec explications sur le code, les choix techniques, et comment exécuter votre solution.
-3.	Un fichier Jupyter Notebook de test et/ou un démonstrateur de votre solution.
-4.	Optionnel : Si vous avez utilisé des API externes pour obtenir des données supplémentaires, indiquez comment configurer l’accès à ces API.
-
-## Rappel
-Lors du débrief de ce test technique, nous aurons une posture de client à qui vous devrez "vendre" votre solution. 
-
-## Important
-Ce test est volontairement particulièrement long. L'idée est de voir votre capacité à prioriser la solution la plus optimale pour répondre à un besoin.
