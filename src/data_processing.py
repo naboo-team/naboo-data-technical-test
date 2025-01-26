@@ -1,27 +1,33 @@
+
 import pandas as pd
 
 def load_data():
     """
-    Charge les fichiers CSV de données (places, providers, services) dans des DataFrames pandas.
+    Charge les fichiers CSV de données (services_activities, providers, venues) dans des DataFrames pandas.
     """
-    places = pd.read_csv('places.csv')
-    service_providers = pd.read_csv('service_providers.csv')
-    services = pd.read_csv('services.csv')
-    
-    return places, service_providers, services
+    services_activities = pd.read_csv('./data/services_activities.csv')
+    service_providers = pd.read_csv('./data/service_providers.csv')
+    venues = pd.read_csv('./data/venues.csv')
 
-def clean_data(places, service_providers, services):
+    return services_activities, service_providers, venues
+
+def clean_data(services_activities, service_providers, venues):
     """
     Effectue un nettoyage basique des données si nécessaire. Par exemple, enlever les doublons,
     vérifier les valeurs manquantes, ou normaliser les chaînes de texte.
     """
-    places.drop_duplicates(inplace=True)
+
+    services_activities.drop_duplicates(inplace=True)
     service_providers.drop_duplicates(inplace=True)
-    services.drop_duplicates(inplace=True)
+    venues.drop_duplicates(inplace=True)
+
+    services_activities = services_activities.applymap(lambda x: x.lower() if isinstance(x, str) else x)
+    service_providers = service_providers.applymap(lambda x: x.lower() if isinstance(x, str) else x)
+    venues = venues.applymap(lambda x: x.lower() if isinstance(x, str) else x)
     
     # D'autres opérations de nettoyage peuvent être ajoutées ici si nécessaire
-    return places, service_providers, services
+    return services_activities, service_providers, venues
 
 # Example of usage
-# places, providers, services = load_data()
-# places, providers, services = clean_data(places, providers, services)
+# services_activities, providers, venues = load_data()
+# services_activities, providers, venues = clean_data(services_activities, providers, venues)

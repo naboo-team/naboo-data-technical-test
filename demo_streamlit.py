@@ -1,14 +1,13 @@
 import streamlit as st
 import pandas as pd
+from src.main import main
+
 
 # Exemple de fonction de recommandation
 def recommend(brief):
     # Appelle votre système de recommandations
     # Ici, on retourne un exemple statique
-    return [
-        {"title": "Lieu 1", "activity": "Randonnée", "city": "Paris"},
-        {"title": "Lieu 2", "activity": "Dîner", "city": "Lyon"}
-    ]
+    return main(brief)
 
 # Titre de l'application
 st.title("Système de recommandations de lieux et d'activités")
