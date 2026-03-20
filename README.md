@@ -95,7 +95,6 @@ Vous devrez créer un script pour extraire les informations essentielles d’un 
 ### 2. Système de Recommandation
 
 En utilisant les données des fichiers CSV, vous devez concevoir un système qui associe les informations extraites du brief avec les lieux et activités les plus pertinents. Pour cela :
-- Méthode recommandée : Une approche de filtrage basée sur les règles, ou un modèle de recommandation plus avancé (par exemple, KNN, apprentissage supervisé si vous avez une étiquette pour la pertinence).
 
 Le système doit produire un classement des recommandations les plus pertinentes.
 
